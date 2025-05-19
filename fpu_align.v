@@ -22,12 +22,12 @@ module fpu_align(
     
     always @ (*) begin
         case (in_operator)
-            2'b00: begin
+            2'b00, 2'b01 : begin
                 shifted_mantissa = in_mantissa_2 >> (in_exponent_1 - in_exponent_2);
                 modified_exponent = in_exponent_1;
             end
             
-            2'b10: begin
+            2'b10 : begin
                 shifted_mantissa = mantissa_2;
                 modified_exponent = in_exponent_1 + in_exponent_2;
             end
@@ -42,7 +42,7 @@ module fpu_align(
     always @ (posedge clk) begin
         sign_1 <= in_sign_1;
         sign_2 <= in_sign_2;
-        exponent = modified_exponent;
+        exponent <= modified_exponent;
         mantissa_1 <= in_mantissa_1;
         mantissa_2 <= shifted_mantissa;
         operator <= in_operator;
