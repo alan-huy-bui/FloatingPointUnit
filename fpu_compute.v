@@ -19,17 +19,41 @@ module fpu_compute(
     
     always @ (*) begin
         case (in_operator)
-            2'b00: begin
-                computed_mantissa = in_mantissa_1 + in_mantissa_2;
-                computed_sign = 0;  // TODO
+            2'b00, 2'b01 : begin
+                case ({in_sign_1, in_sign_2})
+                
+                    //  A + B
+                    2'b00 : begin
+                        computed_mantissa = in_mantissa_1 + in_mantissa_2;
+                        computed_sign = 0;
+                    end
+                    
+                    //  A - B
+                    2'b01 : begin
+                        computed_mantissa = in_mantissa_1 - in_mantissa_2;
+                        computed_sign = 0;
+                    end
+                    
+                    //  -A + B
+                    2'b10 : begin
+                        computed_mantissa = in_mantissa_2 - in_mantissa_1;
+                        computed_sign = 1;
+                    end
+                    
+                    //  -A - B
+                    2'b11 : begin
+                        computed_mantissa = in_mantissa_1 + in_mantissa_2;
+                        computed_sign = 1;
+                    end
+                endcase
             end
             
-            2'b10: begin
+            2'b10 : begin
                 computed_mantissa = in_mantissa_1 * in_mantissa_2;
                 computed_sign =  in_sign_1 ^ in_sign_2;
             end
             
-            default: begin
+            default : begin
                 computed_mantissa = 0;
                 computed_sign = 0;
             end
