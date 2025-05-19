@@ -18,7 +18,7 @@ module fpu_normalize(
     
     always @ (*) begin
         case (in_operator)
-            2'b00 : begin
+            2'b00, 2'b01 : begin
                 if (in_mantissa == 0) begin
                     output_mantissa = 0;
                     modified_exponent = 0;
@@ -27,7 +27,7 @@ module fpu_normalize(
                     output_mantissa = temp_mantissa [22:0];
                     modified_exponent = in_exponent + 1'b1;
                 end else begin
-                    case (in_mantissa[23:0])
+                    casez (in_mantissa[23:0])
                         24'b1??????????????????????? : shift_amount = 0;
                         24'b01?????????????????????? : shift_amount = 1;
                         24'b001????????????????????? : shift_amount = 2;
