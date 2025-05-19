@@ -21,23 +21,77 @@ module fpu_unpack(
     reg [23:0] larger_mantissa;
     reg [23:0] smaller_mantissa;
     
+    wire sign_a, sign_b;
+    wire [7:0] exponent_a, exponent_b;
+    wire [22:0] mantissa_a, mantissa_b;
+    
+    assign sign_a = in_operand_a[31];
+    assign sign_b = in_operand_b[31];
+    assign exponent_a = in_operand_a[30:23];
+    assign exponent_b = in_operand_b[30:23];
+    assign mantissa_a = in_operand_a[22:0];
+    assign mantissa_b = in_operand_b[22:0];
+    
     always @ (*) begin
         //  TODO: Check Exceptions
-        if (in_operand_a[30:23] >= in_operand_b[30:23]) begin
-            larger_sign = in_operand_a[31];
-            larger_exponent = in_operand_a[30:23];
-            larger_mantissa = {1'b1, in_operand_a[22:0]};
-            smaller_sign = in_operand_b[31];
-            smaller_exponent = in_operand_b[30:23];
-            smaller_mantissa = {1'b1, in_operand_b[22:0]};
-        end else begin
-            larger_sign = in_operand_b[31];
-            larger_exponent = in_operand_b[30:23];
-            larger_mantissa = {1'b1, in_operand_b[22:0]};
-            smaller_sign = in_operand_a[31];
-            smaller_exponent = in_operand_a[30:23];
-            smaller_mantissa = {1'b1, in_operand_a[22:0]};
-        end
+        case (in_operator)
+            
+            2'b00: begin
+            
+                //  If |A| < |B|, Then B + A
+                if ((exponent_a < exponent_b) || ((exponent_a == exponent_b) && (mantissa_a < mantissa_b))) begin
+                    larger_sign = sign_b;
+                    larger_exponent = exponent_b;
+                    larger_mantissa = {1'b1, mantissa_b};
+                    smaller_sign = sign_a;
+                    smaller_exponent = exponent_a;
+                    smaller_mantissa = {1'b1, mantissa_a};
+                
+                //  If |A| >= |B|, Then A + B
+                end else begin
+                    larger_sign = sign_a;
+                    larger_exponent = exponent_a;
+                    larger_mantissa = {1'b1, mantissa_a};
+                    smaller_sign = sign_b;
+                    smaller_exponent = exponent_b;
+                    smaller_mantissa = {1'b1, mantissa_b};
+                end
+            end
+            
+            2'b01 : begin
+
+                //  If |A| < |B|, Then -B + A
+                if ((exponent_a < exponent_b) || ((exponent_a == exponent_b) && (mantissa_a < mantissa_b))) begin
+                    larger_sign = ~sign_b;
+                    larger_exponent = exponent_b;
+                    larger_mantissa = {1'b1, mantissa_b};
+                    smaller_sign = sign_a;
+                    smaller_exponent = exponent_a;
+                    smaller_mantissa = {1'b1, mantissa_a};
+                    
+                //  If |A| >= |B|, Then A + -B
+                end else begin
+                    larger_sign = sign_a;
+                    larger_exponent = exponent_a;
+                    larger_mantissa = {1'b1, mantissa_a};
+                    smaller_sign = ~sign_b;
+                    smaller_exponent = exponent_b;
+                    smaller_mantissa = {1'b1, mantissa_b};
+                end
+                
+            end
+            
+            default : begin
+
+                larger_sign = sign_a;
+                larger_exponent = exponent_a;
+                larger_mantissa = {1'b1, mantissa_a};
+                smaller_sign = sign_b;
+                smaller_exponent = exponent_b;
+                smaller_mantissa = {1'b1, mantissa_b};
+                
+            end
+        endcase
     end
     
     always @ (posedge clk) begin
