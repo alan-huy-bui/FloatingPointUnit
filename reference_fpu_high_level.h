@@ -22,9 +22,16 @@
 typedef union {
     uint32_t u;
     float f;
-} IEEE754;
+} IEEE754_Single_Precision;
+
+typedef struct {
+    IEEE754_Single_Precision operand_a;
+    IEEE754_Single_Precision operand_b;
+    uint32_t operator;
+    IEEE754_Single_Precision result;
+} test_vector;
 
 float compute(float operand_a, float operand_b, uint32_t operator);
-void printResult(IEEE754 operand_a, IEEE754 operand_b, uint32_t operator, IEEE754 result, uint32_t test_number);
+void printResult(IEEE754_Single_Precision operand_a, IEEE754_Single_Precision operand_b, uint32_t operator, IEEE754_Single_Precision result, uint32_t test_number);
 
 #endif
