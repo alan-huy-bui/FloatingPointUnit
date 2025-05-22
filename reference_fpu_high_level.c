@@ -5,35 +5,17 @@
 
 int main(void) {
 
-    IEEE754 operand_a[5] = {
-        {.f = 1.0f},
-        {.f = 2.0f},
-        {.f = 3.0f},
-        {.f = 4.0f},
-        {.f = 5.0f}
+    test_vector vectors[5] = {
+        {.operand_a = {.f = 1.0f}, .operand_b = {.f = 1.5f}, .operator = ADD},
+        {.operand_a = {.f = 2.0f}, .operand_b = {.f = 2.5f}, .operator = ADD},
+        {.operand_a = {.f = 3.0f}, .operand_b = {.f = 3.5f}, .operator = ADD},
+        {.operand_a = {.f = 4.0f}, .operand_b = {.f = 4.5f}, .operator = ADD},
+        {.operand_a = {.f = 5.0f}, .operand_b = {.f = 5.5f}, .operator = ADD}
     };
-
-    IEEE754 operand_b[5] = {
-        {.f = 5.0f},
-        {.f = 4.0f},
-        {.f = 3.0f},
-        {.f = 2.0f},
-        {.f = 1.0f}
-    };
-
-    uint32_t operator[5] = {
-        ADD,
-        ADD,
-        ADD,
-        ADD,
-        ADD
-    };
-
-    IEEE754 result[5];
 
     for (uint32_t i = 0; i < 5; i++) {
-        result[i].f = compute(operand_a[i].f, operand_b[i].f, operator[i]);
-        printResult(operand_a[i], operand_b[i], operator[i], result[i], i + 1);
+        vectors[i].result.f = compute(vectors[i].operand_a.f, vectors[i].operand_b.f, vectors[i].operator);
+        printResult(vectors[i].operand_a, vectors[i].operand_b, vectors[i].operator, vectors[i].result, i + 1);
     }
 
     return 0;
@@ -48,7 +30,7 @@ float compute(float operand_a, float operand_b, uint32_t operator) {
     }
 }
 
-void printResult(IEEE754 operand_a, IEEE754 operand_b, uint32_t operator, IEEE754 result, uint32_t test_number) {
+void printResult(IEEE754_Single_Precision operand_a, IEEE754_Single_Precision operand_b, uint32_t operator, IEEE754_Single_Precision result, uint32_t test_number) {
     printf("Test Case %u:\n    ", test_number);
     printf("%f + %f = %f\n", operand_a.f, operand_b.f, result.f);
 }
